@@ -1,4 +1,4 @@
-# rush-hour-game
+# Rush Hour Game
 
 ## Project setup
 ```
