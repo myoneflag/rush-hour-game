@@ -1,50 +1,49 @@
 <template>
   <div class="board">
-    <v-stage :config="configKonva">
+    <v-stage
+      :config="{
+        width: boardConfig.width,
+        height: boardConfig.height,
+      }"
+    >
       <GridLayer />
       <v-layer>
         <v-group
           :config="{
-            x: item.x,
-            y: item.y,
-            id: `${item.type}-car-${index}`,
+            x: getPositionOfCar(car).x,
+            y: getPositionOfCar(car).y,
+            id: `car-${index}`,
             draggable: true,
             dragBoundFunc: function (pos) {
-              return item.type === 'long' || item.type === 'vertical'
+              return car.isVertical
                 ? {
                     x: this.absolutePosition().x,
-                    y:
-                      pos.y > 540 - (item.type === 'long' ? 270 : 180)
-                        ? 540 - (item.type === 'long' ? 270 : 180)
-                        : pos.y < 0
-                        ? 0
-                        : pos.y,
+                    y: getBound(pos, car, index),
                   }
                 : {
-                    x: pos.x > 540 - 180 ? 540 - 180 : pos.x < 0 ? 0 : pos.x,
+                    x: getBound(pos, car, index),
                     y: this.absolutePosition().y,
                   };
             },
           }"
-          v-for="(item, index) in boardData"
+          v-for="(car, index) in boardData"
           :key="index"
-          @dragend="(e) => handleDragCar(e, index)"
+          @dragstart="(e) => handleDraggingCar(e, index)"
+          @dragend="(e) => handleDragEndCar(e, index)"
         >
           <v-image
             :config="{
               x: 0,
               y: 0,
-              image: assets[`${item.type}Car`],
-              width:
-                item.type === 'long' || item.type === 'vertical' ? 90 : 180,
-              height:
-                item.type === 'long'
-                  ? 270
-                  : item.type === 'vertical'
-                  ? 180
-                  : 90,
+              image: getCarImage(car),
+              width: car.isVertical
+                ? boardConfig.cellWidth
+                : car.cellCount * boardConfig.cellWidth,
+              height: car.isVertical
+                ? car.cellCount * boardConfig.cellHeight
+                : boardConfig.cellHeight,
             }"
-            v-if="!!assets[`${item.type}Car`]"
+            v-if="!!getCarImage(car)"
           />
         </v-group>
       </v-layer>
@@ -56,11 +55,19 @@
 import Vue from "vue";
 import GridLayer from "@/components/GridLayer.vue";
 
-declare interface Assets {
-  mainCar: any;
-  verticalCar: any;
-  horizontalCar: any;
-  longCar: any;
+function genCharArray(charA: string, charZ: string) {
+  var arr = [],
+    i = charA.charCodeAt(0),
+    j = charZ.charCodeAt(0);
+  for (; i <= j; ++i) {
+    arr.push(String.fromCharCode(i).toUpperCase());
+  }
+  return arr;
+}
+
+declare interface Position {
+  x: number;
+  y: number;
 }
 
 export default Vue.extend({
@@ -71,49 +78,29 @@ export default Vue.extend({
   props: {
     msg: String,
   },
+  computed: {
+    boardConfig() {
+      const data = this.$store.getters.boardConfig;
+      return {
+        ...data,
+        cellWidth: data.width / data.gridSize,
+        cellHeight: data.height / data.gridSize,
+      };
+    },
+    boardData() {
+      return this.$store.getters.boardData;
+    },
+  },
   data() {
     return {
-      configKonva: {
-        width: 540,
-        height: 540,
-        fill: "white",
-      },
-      configCircle: {
-        x: 100,
-        y: 100,
-        radius: 70,
-        fill: "red",
-        stroke: "black",
-        strokeWidth: 4,
-      },
+      letters: genCharArray("a", "f"),
       assets: {
-        mainCar: null,
-        verticalCar: null,
-        horizontalCar: null,
-        longCar: null,
-      } as Assets,
-      boardData: [
-        {
-          x: 0,
-          y: 0,
-          type: "vertical",
-        },
-        {
-          x: 180,
-          y: 360,
-          type: "horizontal",
-        },
-        {
-          x: 360,
-          y: 270,
-          type: "long",
-        },
-        {
-          x: 360,
-          y: 180,
-          type: "main",
-        },
-      ],
+        blueVerticalCar: null,
+        redCar: null,
+        orangeCar: null,
+        greenCar: null,
+      },
+      dragging: false,
     };
   },
   mounted() {
@@ -129,8 +116,124 @@ export default Vue.extend({
     });
   },
   methods: {
-    handleDragCar(e: any, index: number) {
-      console.log(e, index);
+    getStartAtFromPosition(position: Position) {
+      const remainX = position.x % this.boardConfig.cellWidth;
+      const remainY = position.y % this.boardConfig.cellHeight;
+      const colIndex =
+        remainX > this.boardConfig.cellWidth / 2
+          ? Math.ceil(position.x / this.boardConfig.cellWidth)
+          : Math.floor(position.x / this.boardConfig.cellWidth);
+      const rowIndex =
+        remainY > this.boardConfig.cellHeight / 2
+          ? Math.ceil(position.y / this.boardConfig.cellHeight)
+          : Math.floor(position.y / this.boardConfig.cellHeight);
+      return {
+        x: colIndex * this.boardConfig.cellWidth,
+        y: rowIndex * this.boardConfig.cellHeight,
+        startAt: this.letters[rowIndex] + (colIndex + 1),
+      };
+    },
+    getPositionOfCar(car: any) {
+      const rowIndex = this.letters.indexOf(car.startAt.charAt(0));
+      const colIndex = parseInt(car.startAt.substring(1)) - 1;
+      return {
+        x: colIndex * this.boardConfig.cellWidth,
+        y: rowIndex * this.boardConfig.cellHeight,
+        _x: car.isVertical
+          ? (colIndex + 1) * this.boardConfig.cellWidth
+          : (colIndex + car.cellCount) * this.boardConfig.cellWidth,
+        _y: car.isVertical
+          ? (rowIndex + car.cellCount) * this.boardConfig.cellHeight
+          : (rowIndex + 1) * this.boardConfig.cellHeight,
+      };
+    },
+    // Get max and min of X
+    getRangeX(i: number) {
+      const car = this.boardData[i];
+      const maxX = [
+          this.boardConfig.width - car.cellCount * this.boardConfig.cellWidth,
+        ] as number[],
+        minX = [0] as number[];
+      const pos = this.getPositionOfCar(car);
+      this.boardData.forEach((el: any, index: number) => {
+        if (i !== index) {
+          const { x, y, _x, _y } = this.getPositionOfCar(el);
+          if (y <= pos.y && _y > pos.y) {
+            if (x <= pos.x) {
+              minX.push(_x);
+            } else {
+              maxX.push(x + pos.x - pos._x);
+            }
+          }
+        }
+      });
+      return {
+        max: Math.min(...maxX),
+        min: Math.max(...minX),
+      };
+    },
+    // Get max and min of Y
+    getRangeY(i: number) {
+      const car = this.boardData[i];
+      const maxY = [
+          this.boardConfig.height - car.cellCount * this.boardConfig.cellHeight,
+        ] as number[],
+        minY = [0] as number[];
+      const pos = this.getPositionOfCar(car);
+      this.boardData.forEach((el: any, index: number) => {
+        if (i !== index) {
+          const { x, y, _x, _y } = this.getPositionOfCar(el);
+          if (x <= pos.x && _x > pos.x) {
+            if (y <= pos.y) {
+              minY.push(_y);
+            } else {
+              maxY.push(y + pos.y - pos._y);
+            }
+          }
+        }
+      });
+      return {
+        max: Math.min(...maxY),
+        min: Math.max(...minY),
+      };
+    },
+    // Get Bound
+    getBound(pos: Position, car: any, index: number) {
+      if (car.isVertical) {
+        const { max, min } = this.getRangeY(index);
+        return pos.y > max ? max : pos.y < min ? min : pos.y;
+      } else {
+        const { max, min } = this.getRangeX(index);
+        return pos.x > max ? max : pos.x < min ? min : pos.x;
+      }
+    },
+    // Drag event
+    handleDraggingCar(e: any, index: number) {
+      this.dragging = true;
+      const newPos = this.getStartAtFromPosition({
+        x: e.target.x(),
+        y: e.target.y(),
+      });
+      console.log(newPos);
+    },
+    handleDragEndCar(e: any, index: number) {
+      this.dragging = false;
+      const newPos = this.getStartAtFromPosition({
+        x: e.target.x(),
+        y: e.target.y(),
+      });
+      this.boardData[index].startAt = newPos.startAt;
+      e.target.x(newPos.x);
+      e.target.y(newPos.y);
+      this.$store.commit("updateBoardData", this.boardData);
+    },
+    // Get Car Image
+    getCarImage(car: any) {
+      return car.isVertical
+        ? this.assets[`blueVerticalCar`]
+        : car.color === "red"
+        ? this.assets[`redCar`]
+        : this.assets[`greenCar`];
     },
   },
 });
@@ -147,5 +250,6 @@ export default Vue.extend({
   align-items: center;
   background-color: white;
   border-radius: 6px;
+  cursor: pointer;
 }
 </style>
