@@ -38,6 +38,7 @@ export default Vue.extend({
   },
   created() {
     this.boards = boardList;
+    console.log(this.boards[1].data[0].startAt);
   },
   data() {
     return {
@@ -50,9 +51,13 @@ export default Vue.extend({
         (board) => board.id === this.boardConfig.id
       );
       this.$store.commit("updateBoardData", activeBoard.data);
+      this.$store.commit("clearHistory");
     },
     handleBackBoard() {
-      this.$store.commit("backBoard");
+      const lastData = this.boardHistory[this.boardHistory.length - 2];
+      if (lastData) this.$store.commit("updateBoardData", lastData);
+      else this.handleResetBoard();
+      this.$store.commit("popHistory");
     },
   },
 });
@@ -82,5 +87,8 @@ export default Vue.extend({
 }
 .btn:not(:disabled):hover {
   box-shadow: inset 0px 0px 20px 5px #000000;
+}
+.btn:not(:disabled):active {
+  box-shadow: inset 0px 0px 10px 5px #000000;
 }
 </style>

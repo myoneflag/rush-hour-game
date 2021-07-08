@@ -46,6 +46,7 @@
             y: boardConfig.cellHeight * 2,
             width: 5,
             height: boardConfig.cellHeight,
+            ...getPositionOfDoor(),
             fill: '#f93c3c',
             shadowBlur: 10,
           }"
@@ -58,7 +59,7 @@
             x: getPositionOfCar(car).x,
             y: getPositionOfCar(car).y,
             id: `car-${index}`,
-            draggable: true,
+            draggable: gameScore.success ? false : true,
             dragBoundFunc: function (pos) {
               return car.isVertical
                 ? {
@@ -91,6 +92,24 @@
             v-if="!!getCarImage(car)"
           />
         </v-group>
+      </v-layer>
+      <v-layer>
+        <v-text
+          :config="{
+            x: 0,
+            y: boardConfig.height / 2,
+            width: boardConfig.width,
+            fill: '#FFCAA1',
+            stroke: 'red',
+            strokeWidth: 2,
+            align: 'center',
+            text: 'Success! Great!',
+            fontSize: 48,
+            lineHeight: 1,
+            fontWeight: 'bolder',
+          }"
+          v-if="!!gameScore.success"
+        />
       </v-layer>
     </v-stage>
   </div>
@@ -127,6 +146,9 @@ export default Vue.extend({
     },
     boardData() {
       return this.$store.getters.boardData;
+    },
+    gameScore() {
+      return this.$store.getters.gameScore;
     },
   },
   data() {
@@ -184,6 +206,53 @@ export default Vue.extend({
           ? (rowIndex + car.cellCount) * this.boardConfig.cellHeight
           : (rowIndex + 1) * this.boardConfig.cellHeight,
       };
+    },
+    getPositionOfDoor() {
+      const rowIndex = this.letters.indexOf(
+        this.boardConfig.exitDoor.charAt(0)
+      );
+      const colIndex = parseInt(this.boardConfig.exitDoor.substring(1)) - 1;
+      if (colIndex === 0) {
+        return {
+          x: 0,
+          y: rowIndex * this.boardConfig.cellHeight,
+          isVertical: false,
+        };
+      }
+      if (colIndex === this.boardConfig.gridSize - 1) {
+        return {
+          x: this.boardConfig.width,
+          y: rowIndex * this.boardConfig.cellHeight,
+          width: -5,
+          isVertical: false,
+          oppr: true,
+        };
+      } else {
+        if (rowIndex === 0) {
+          return {
+            x: colIndex * this.boardConfig.cellWidth,
+            y: 0,
+            width: this.boardConfig.cellWidth,
+            height: 5,
+            isVertical: true,
+          };
+        } else if (rowIndex === this.boardConfig.gridSize - 1) {
+          return {
+            x: colIndex * this.boardConfig.cellWidth,
+            y: this.boardConfig.height,
+            width: this.boardConfig.cellWidth,
+            height: -5,
+            isVertical: true,
+            oppr: true,
+          };
+        } else {
+          return {
+            x: colIndex * this.boardConfig.cellWidth,
+            y: rowIndex * this.boardConfig.cellHeight,
+            isVertical: false,
+          };
+        }
+      }
     },
     // Get max and min of X
     getRangeX(i: number) {
@@ -252,10 +321,22 @@ export default Vue.extend({
         x: e.target.x(),
         y: e.target.y(),
       });
-      this.boardData[index].startAt = newPos.startAt;
+      localStorage.setItem("activeBoard", JSON.stringify(this.boardData));
+      const boardData = JSON.parse(localStorage.getItem("activeBoard") || "[]");
+      boardData[index].startAt = newPos.startAt;
       e.target.x(newPos.x);
       e.target.y(newPos.y);
-      // this.$store.commit("updateBoardData", this.boardData);
+      this.$store.commit("updateBoardData", boardData);
+      this.$store.commit("pushHistory", boardData);
+      localStorage.removeItem("activeBoard");
+      // Success Game
+      if (
+        !!this.getPositionOfDoor().isVertical ===
+          !!boardData[index].isVertical &&
+        newPos.startAt === this.boardConfig.exitDoor
+      ) {
+        this.gameScore.success = true;
+      }
     },
     // Get Car Image
     getCarImage(car: any) {

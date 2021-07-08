@@ -1,6 +1,5 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import { boardList } from "@/constant";
 
 Vue.use(Vuex);
 
@@ -30,63 +29,64 @@ export default new Vuex.Store({
       width: 540,
       height: 540,
       gridSize: 6,
+      exitDoor: "C1",
       gridLineColor: "#ddd",
     },
     activeBoard: {
       id: null as null | number,
       gridSize: 1,
+      exitDoor: "C1",
       data: [] as any[],
     },
     boardHistory: [] as any[],
+    score: {
+      success: false,
+    },
   },
   getters: {
     userInfo: (state) => {
       return state.user;
     },
-    // boardList: () => {
-    //   return [...boardList];
-    // },
     boardConfig: (state) => {
       return {
         ...state.boardConfig,
         id: state.activeBoard.id,
         gridSize: state.activeBoard.gridSize,
+        exitDoor: state.activeBoard.exitDoor,
       };
     },
     boardData: (state) => {
-      return [...state.activeBoard.data];
+      return state.activeBoard.data;
     },
     boardHistory: (state) => {
       return state.boardHistory;
+    },
+    gameScore: (state) => {
+      return state.score;
     },
   },
   mutations: {
     selectActiveBoard(state, activeBoard) {
       state.activeBoard = { ...activeBoard };
+      state.boardHistory = [];
+      state.score.success = false;
     },
     updateBoardData(state, data) {
-      console.log([...boardList][1].data[0].startAt);
       state.activeBoard = {
         ...state.activeBoard,
         data: [...data],
       };
-      console.log([...boardList][1].data[0].startAt);
     },
     pushHistory(state, data) {
       state.boardHistory.push(data);
     },
-    resetBoard(state) {
-      const board = boardList.find(
-        (board) => board.id === state.activeBoard.id
-      );
-      if (board) {
-        console.log(board.data[0].startAt, state.activeBoard.data[0].startAt);
-        // state.activeBoard.data = [...board.data];
-      }
+    popHistory(state) {
+      state.boardHistory.pop();
+      state.score.success = false;
     },
-    // backBoard(state) {},
-    updateBoardConfig(state, boardConfig) {
-      state.boardConfig = boardConfig;
+    clearHistory(state) {
+      state.boardHistory = [];
+      state.score.success = false;
     },
   },
   actions: {},
