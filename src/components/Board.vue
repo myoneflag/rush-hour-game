@@ -6,7 +6,52 @@
         height: boardConfig.height,
       }"
     >
-      <GridLayer />
+      <!-- Grid Layer -->
+      <v-layer>
+        <v-line
+          :config="{
+            points: [
+              0,
+              (index + 1) * boardConfig.cellWidth,
+              boardConfig.width,
+              (index + 1) * boardConfig.cellWidth,
+            ],
+            stroke: boardConfig.gridLineColor,
+            strokeWidth: 1,
+            lineCap: 'round',
+            lineJoin: 'round',
+          }"
+          v-for="(_, index) in new Array(boardConfig.gridSize - 1)"
+          :key="'vertical-line-' + index"
+        />
+        <v-line
+          :config="{
+            points: [
+              (index + 1) * boardConfig.cellHeight,
+              0,
+              (index + 1) * boardConfig.cellHeight,
+              boardConfig.height,
+            ],
+            stroke: boardConfig.gridLineColor,
+            strokeWidth: 1,
+            lineCap: 'round',
+            lineJoin: 'round',
+          }"
+          v-for="(_, index) in new Array(boardConfig.gridSize - 1)"
+          :key="'horizontal-line-' + index"
+        />
+        <v-rect
+          :config="{
+            x: 0,
+            y: boardConfig.cellHeight * 2,
+            width: 5,
+            height: boardConfig.cellHeight,
+            fill: '#f93c3c',
+            shadowBlur: 10,
+          }"
+        />
+      </v-layer>
+      <!-- Board Layer -->
       <v-layer>
         <v-group
           :config="{
@@ -28,8 +73,8 @@
           }"
           v-for="(car, index) in boardData"
           :key="index"
-          @dragstart="(e) => handleDraggingCar(e, index)"
-          @dragend="(e) => handleDragEndCar(e, index)"
+          :draggable="true"
+          v-on:dragend="(e) => handleDragEndCar(e, index)"
         >
           <v-image
             :config="{
@@ -53,7 +98,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-import GridLayer from "@/components/GridLayer.vue";
 
 function genCharArray(charA: string, charZ: string) {
   var arr = [],
@@ -72,12 +116,6 @@ declare interface Position {
 
 export default Vue.extend({
   name: "Board",
-  components: {
-    GridLayer,
-  },
-  props: {
-    msg: String,
-  },
   computed: {
     boardConfig() {
       const data = this.$store.getters.boardConfig;
@@ -110,8 +148,8 @@ export default Vue.extend({
       image.onload = () => {
         this.assets = { ...this.assets, [key]: image };
       };
-      image.onerror = (err) => {
-        console.log(err);
+      image.onerror = () => {
+        console.log(image.src);
       };
     });
   },
@@ -208,14 +246,6 @@ export default Vue.extend({
       }
     },
     // Drag event
-    handleDraggingCar(e: any, index: number) {
-      this.dragging = true;
-      const newPos = this.getStartAtFromPosition({
-        x: e.target.x(),
-        y: e.target.y(),
-      });
-      console.log(newPos);
-    },
     handleDragEndCar(e: any, index: number) {
       this.dragging = false;
       const newPos = this.getStartAtFromPosition({
@@ -225,7 +255,7 @@ export default Vue.extend({
       this.boardData[index].startAt = newPos.startAt;
       e.target.x(newPos.x);
       e.target.y(newPos.y);
-      this.$store.commit("updateBoardData", this.boardData);
+      // this.$store.commit("updateBoardData", this.boardData);
     },
     // Get Car Image
     getCarImage(car: any) {

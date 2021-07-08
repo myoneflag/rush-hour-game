@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import { boardList } from "@/constant";
 
 Vue.use(Vuex);
 
@@ -21,99 +22,69 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    user: {
+      email: "grisha97924@gmail.com",
+      name: "Artem",
+    },
     boardConfig: {
       width: 540,
       height: 540,
       gridSize: 6,
       gridLineColor: "#ddd",
     },
-    boardData: [
-      {
-        startAt: "A1",
-        cellCount: 3,
-        color: "blue",
-        isVertical: false,
-      },
-      {
-        startAt: "B1",
-        cellCount: 2,
-        color: "purple",
-        isVertical: true,
-      },
-      {
-        startAt: "A4",
-        cellCount: 3,
-        color: "gray",
-        isVertical: true,
-      },
-      {
-        startAt: "A5",
-        cellCount: 2,
-        color: "yellow",
-        isVertical: true,
-      },
-      {
-        startAt: "A6",
-        cellCount: 2,
-        color: "green",
-        isVertical: true,
-      },
-      {
-        startAt: "C5",
-        cellCount: 2,
-        color: "red",
-        isVertical: false,
-      },
-      {
-        startAt: "D1",
-        cellCount: 2,
-        color: "forestgreen",
-        isVertical: false,
-      },
-      {
-        startAt: "E2",
-        cellCount: 2,
-        color: "blue",
-        isVertical: true,
-      },
-      {
-        startAt: "D3",
-        cellCount: 2,
-        color: "orange",
-        isVertical: true,
-      },
-      {
-        startAt: "F3",
-        cellCount: 2,
-        color: "yellow",
-        isVertical: false,
-      },
-      {
-        startAt: "F5",
-        cellCount: 2,
-        color: "black",
-        isVertical: false,
-      },
-      {
-        startAt: "E5",
-        cellCount: 2,
-        color: "slategray",
-        isVertical: false,
-      },
-    ],
+    activeBoard: {
+      id: null as null | number,
+      gridSize: 1,
+      data: [] as any[],
+    },
+    boardHistory: [] as any[],
   },
   getters: {
+    userInfo: (state) => {
+      return state.user;
+    },
+    // boardList: () => {
+    //   return [...boardList];
+    // },
     boardConfig: (state) => {
-      return state.boardConfig;
+      return {
+        ...state.boardConfig,
+        id: state.activeBoard.id,
+        gridSize: state.activeBoard.gridSize,
+      };
     },
     boardData: (state) => {
-      return state.boardData;
+      return [...state.activeBoard.data];
+    },
+    boardHistory: (state) => {
+      return state.boardHistory;
     },
   },
   mutations: {
-    updateBoardData(state, boardData) {
-      state.boardData = boardData;
+    selectActiveBoard(state, activeBoard) {
+      state.activeBoard = { ...activeBoard };
     },
+    updateBoardData(state, data) {
+      console.log([...boardList][1].data[0].startAt);
+      state.activeBoard = {
+        ...state.activeBoard,
+        data: [...data],
+      };
+      console.log([...boardList][1].data[0].startAt);
+    },
+    pushHistory(state, data) {
+      state.boardHistory.push(data);
+    },
+    resetBoard(state) {
+      const board = boardList.find(
+        (board) => board.id === state.activeBoard.id
+      );
+      if (board) {
+        console.log(board.data[0].startAt, state.activeBoard.data[0].startAt);
+        // state.activeBoard.data = [...board.data];
+      }
+    },
+    // backBoard(state) {},
     updateBoardConfig(state, boardConfig) {
       state.boardConfig = boardConfig;
     },
