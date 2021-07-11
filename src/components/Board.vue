@@ -219,6 +219,7 @@ export default Vue.extend({
         startAt: this.letters[rowIndex] + (colIndex + 1),
       };
     },
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
     getPositionOfCar(car: any) {
       const rowIndex = this.letters.indexOf(car.startAt.charAt(0));
       const colIndex = parseInt(car.startAt.substring(1)) - 1;
@@ -288,6 +289,7 @@ export default Vue.extend({
         ] as number[],
         minX = [0] as number[];
       const pos = this.getPositionOfCar(car);
+      /* eslint-disable  @typescript-eslint/no-explicit-any */
       this.boardData.forEach((el: any, index: number) => {
         if (i !== index) {
           const { x, y, _x, _y } = this.getPositionOfCar(el);
@@ -313,6 +315,7 @@ export default Vue.extend({
         ] as number[],
         minY = [0] as number[];
       const pos = this.getPositionOfCar(car);
+      /* eslint-disable  @typescript-eslint/no-explicit-any */
       this.boardData.forEach((el: any, index: number) => {
         if (i !== index) {
           const { x, y, _x, _y } = this.getPositionOfCar(el);
@@ -331,6 +334,7 @@ export default Vue.extend({
       };
     },
     // Get Bound
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
     getBound(pos: Position, car: any, index: number) {
       if (car.isVertical) {
         const { max, min } = this.getRangeY(index);
@@ -341,6 +345,7 @@ export default Vue.extend({
       }
     },
     // Drag event
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
     handleDragEndCar(e: any, index: number) {
       this.dragging = false;
       const newPos = this.getStartAtFromPosition({
@@ -365,6 +370,7 @@ export default Vue.extend({
       }
     },
     // Get Car Image
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
     getCarImage(car: any, index: number): any {
       const images = Object.values(this.assets);
       return car.color === "red"

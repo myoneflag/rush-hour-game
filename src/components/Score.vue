@@ -33,12 +33,15 @@ export default Vue.extend({
   },
   data() {
     return {
+      /* eslint-disable  @typescript-eslint/no-explicit-any */
       boards: [] as any[],
     };
   },
   methods: {
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
     handleChangeBoard(e: any) {
       const activeBoard = this.boards.find(
+        /* eslint-disable  @typescript-eslint/no-explicit-any */
         (el: any) => el.id.toString() === e.target.value
       );
       this.$store.commit("selectActiveBoard", { ...activeBoard });

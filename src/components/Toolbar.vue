@@ -42,6 +42,7 @@ export default Vue.extend({
   },
   data() {
     return {
+      /* eslint-disable  @typescript-eslint/no-explicit-any */
       boards: [] as any[],
     };
   },

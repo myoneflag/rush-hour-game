@@ -19,8 +19,10 @@ export default new Vuex.Store({
     activeBoard: {
       id: null as null | number,
       gridSize: 1,
+      /* eslint-disable  @typescript-eslint/no-explicit-any */
       data: [] as any[],
     },
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
     boardHistory: [] as any[],
     score: {
       success: false,
