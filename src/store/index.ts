@@ -18,7 +18,7 @@ export default new Vuex.Store({
     },
     activeBoard: {
       id: null as null | number,
-      gridSize: 1,
+      gridSize: 6,
       /* eslint-disable  @typescript-eslint/no-explicit-any */
       data: [] as any[],
     },

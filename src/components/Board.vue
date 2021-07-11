@@ -8,7 +8,37 @@
     >
       <!-- Grid Layer -->
       <v-layer>
-        <v-line
+        <v-group
+          :config="{
+            x: 0,
+            y: index * boardConfig.cellWidth,
+            id: `vertical-${index}`,
+          }"
+          v-for="(_, index) in new Array(boardConfig.gridSize)"
+          :key="'vertical-line-' + index"
+        >
+          <v-group
+            :config="{
+              x: j * boardConfig.cellHeight,
+              y: 0,
+              id: `horizontal-${j}`,
+            }"
+            v-for="(_, j) in new Array(boardConfig.gridSize)"
+            :key="'vertical-line-' + j"
+          >
+            <v-image
+              :config="{
+                x: 0,
+                y: 0,
+                image: backImg,
+                width: boardConfig.cellWidth,
+                height: boardConfig.cellHeight,
+              }"
+              v-if="!!backImg"
+            />
+          </v-group>
+        </v-group>
+        <!-- <v-line
           :config="{
             points: [
               0,
@@ -39,7 +69,7 @@
           }"
           v-for="(_, index) in new Array(boardConfig.gridSize - 1)"
           :key="'horizontal-line-' + index"
-        />
+        /> -->
         <v-rect
           :config="{
             x: 0,
@@ -186,6 +216,7 @@ export default Vue.extend({
 
         redcarEW: null,
       },
+      backImg: null as any,
       dragging: false,
     };
   },
@@ -200,6 +231,11 @@ export default Vue.extend({
         console.log(image.src);
       };
     });
+    const image = new window.Image();
+    image.src = `./TrafficJam.png`;
+    image.onload = () => {
+      this.backImg = image;
+    };
   },
   methods: {
     getStartAtFromPosition(position: Position) {
@@ -397,7 +433,7 @@ export default Vue.extend({
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: white;
+  background-color: #cccccc;
   border-radius: 6px;
   cursor: pointer;
 }
