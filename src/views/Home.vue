@@ -31,17 +31,26 @@ export default Vue.extend({
   width: 100%;
   /* min-height: 100vh; */
   display: flex;
+  height: 100%;
   align-items: center;
   justify-content: center;
 }
 .container {
   width: 543px;
-  height: 800px;
   display: flex;
   flex-direction: column;
   background-color: grey;
   border-radius: 20px;
   box-shadow: inset 0px 0px 20px 2px #2f2f2f;
   padding: 20px;
+}
+@media only screen and (max-width: 543px) {
+  .home {
+    height: 100vh;
+  }
+  .container {
+    border-radius: 0px;
+    height: calc(100% - 40px);
+  }
 }
 </style>

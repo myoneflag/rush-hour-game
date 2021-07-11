@@ -138,10 +138,13 @@ export default Vue.extend({
   computed: {
     boardConfig() {
       const data = this.$store.getters.boardConfig;
+      const width = Math.min(data.width, window.innerWidth - 50);
       return {
         ...data,
-        cellWidth: data.width / data.gridSize,
-        cellHeight: data.height / data.gridSize,
+        width,
+        height: width,
+        cellWidth: width / data.gridSize,
+        cellHeight: width / data.gridSize,
       };
     },
     boardData() {
@@ -382,6 +385,7 @@ export default Vue.extend({
 <style scoped>
 .board {
   width: 100%;
+  max-width: 100%;
   height: 543px;
   margin: 8.5px 0;
   display: flex;
@@ -390,5 +394,10 @@ export default Vue.extend({
   background-color: white;
   border-radius: 6px;
   cursor: pointer;
+}
+@media only screen and (max-width: 543px) {
+  .board {
+    height: calc(100vw - 50px);
+  }
 }
 </style>

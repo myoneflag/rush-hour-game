@@ -19,7 +19,6 @@ export default new Vuex.Store({
     activeBoard: {
       id: null as null | number,
       gridSize: 1,
-      exitDoor: "C1",
       data: [] as any[],
     },
     boardHistory: [] as any[],
@@ -36,7 +35,6 @@ export default new Vuex.Store({
         ...state.boardConfig,
         id: state.activeBoard.id,
         gridSize: state.activeBoard.gridSize,
-        exitDoor: state.activeBoard.exitDoor,
       };
     },
     boardData: (state) => {
