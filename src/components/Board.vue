@@ -81,7 +81,7 @@
             :config="{
               x: 0,
               y: 0,
-              image: getCarImage(car),
+              image: getCarImage(car, index),
               width: car.isVertical
                 ? boardConfig.cellWidth
                 : car.cellCount * boardConfig.cellWidth,
@@ -89,7 +89,7 @@
                 ? car.cellCount * boardConfig.cellHeight
                 : boardConfig.cellHeight,
             }"
-            v-if="!!getCarImage(car)"
+            v-if="!!getCarImage(car, index)"
           />
         </v-group>
       </v-layer>
@@ -118,7 +118,7 @@
 <script lang="ts">
 import Vue from "vue";
 
-function genCharArray(charA: string, charZ: string) {
+function genCharArray(charA: string, charZ: string): Array<string> {
   var arr = [],
     i = charA.charCodeAt(0),
     j = charZ.charCodeAt(0);
@@ -155,10 +155,33 @@ export default Vue.extend({
     return {
       letters: genCharArray("a", "f"),
       assets: {
-        blueVerticalCar: null,
-        redCar: null,
-        orangeCar: null,
-        greenCar: null,
+        AcarEW: null,
+        BcarEW: null,
+        CcarEW: null,
+        DcarEW: null,
+        EcarEW: null,
+        FcarEW: null,
+        GcarEW: null,
+
+        AcarNS: null,
+        BcarNS: null,
+        CcarNS: null,
+        DcarNS: null,
+        EcarNS: null,
+        FcarNS: null,
+        GcarNS: null,
+
+        OlorryEW: null,
+        PlorryEW: null,
+        QlorryEW: null,
+        RlorryEW: null,
+
+        OlorryNS: null,
+        PlorryNS: null,
+        QlorryNS: null,
+        RlorryNS: null,
+
+        redcarEW: null,
       },
       dragging: false,
     };
@@ -166,7 +189,7 @@ export default Vue.extend({
   mounted() {
     Object.keys(this.assets).forEach((key) => {
       const image = new window.Image();
-      image.src = `./${key}.png`;
+      image.src = `./${key}.gif`;
       image.onload = () => {
         this.assets = { ...this.assets, [key]: image };
       };
@@ -339,12 +362,17 @@ export default Vue.extend({
       }
     },
     // Get Car Image
-    getCarImage(car: any) {
-      return car.isVertical
-        ? this.assets[`blueVerticalCar`]
-        : car.color === "red"
-        ? this.assets[`redCar`]
-        : this.assets[`greenCar`];
+    getCarImage(car: any, index: number): any {
+      const images = Object.values(this.assets);
+      return car.color === "red"
+        ? this.assets[`redcarEW`]
+        : car.isVertical
+        ? car.cellCount === 2
+          ? images[(index % 7) + 7]
+          : images[(index % 4) + 18]
+        : car.cellCount === 2
+        ? images[index % 7]
+        : images[(index % 4) + 14];
     },
   },
 });

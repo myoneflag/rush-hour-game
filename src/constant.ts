@@ -1,8 +1,23 @@
+/* 
+  ____ ____ ____ ____ ____ ____
+ | A1 | A2 | A3 | A4 | A5 | A6 |
+ |____ ____ ____ ____ ____ ____|
+ | B1 | B2 | B3 | B4 | B5 | B6 |
+ |____ ____ ____ ____ ____ ____|
+<  C1 | C2 | C3 | C4 | C5 | C6 |
+< ____ ____ ____ ____ ____ ____|
+ | D1 | D2 | D3 | D4 | D5 | D6 |
+ |____ ____ ____ ____ ____ ____|
+ | E1 | E2 | E3 | E4 | E5 | E6 |
+ |____ ____ ____ ____ ____ ____|
+ | F1 | F2 | F3 | F4 | F5 | F6 |
+ |____ ____ ____ ____ ____ ____|
+*/
+
 export const boardList = [
   {
     id: 1,
     gridSize: 5,
-    exitDoor: "C1",
     data: [
       {
         startAt: "A1",
@@ -39,7 +54,6 @@ export const boardList = [
   {
     id: 2,
     gridSize: 5,
-    exitDoor: "D1",
     data: [
       {
         startAt: "A1",
@@ -76,7 +90,6 @@ export const boardList = [
   {
     id: 3,
     gridSize: 5,
-    exitDoor: "B1",
     data: [
       {
         startAt: "A1",
@@ -119,7 +132,6 @@ export const boardList = [
   {
     id: 4,
     gridSize: 5,
-    exitDoor: "A3",
     data: [
       {
         startAt: "B1",
@@ -162,7 +174,6 @@ export const boardList = [
   {
     id: 5,
     gridSize: 5,
-    exitDoor: "B5",
     data: [
       {
         startAt: "A1",
@@ -205,7 +216,6 @@ export const boardList = [
   {
     id: 6,
     gridSize: 5,
-    exitDoor: "D5",
     data: [
       {
         startAt: "A1",
@@ -248,7 +258,6 @@ export const boardList = [
   {
     id: 7,
     gridSize: 5,
-    exitDoor: "C4",
     data: [
       {
         startAt: "A1",
@@ -291,7 +300,6 @@ export const boardList = [
   {
     id: 8,
     gridSize: 5,
-    exitDoor: "E5",
     data: [
       {
         startAt: "A1",
@@ -334,7 +342,6 @@ export const boardList = [
   {
     id: 9,
     gridSize: 5,
-    exitDoor: "F5",
     data: [
       {
         startAt: "A1",
@@ -377,7 +384,6 @@ export const boardList = [
   {
     id: 10,
     gridSize: 5,
-    exitDoor: "A2",
     data: [
       {
         startAt: "A1",
@@ -420,7 +426,6 @@ export const boardList = [
   {
     id: 11,
     gridSize: 6,
-    exitDoor: "C1",
     data: [
       {
         startAt: "A4",
@@ -475,7 +480,6 @@ export const boardList = [
   {
     id: 12,
     gridSize: 6,
-    exitDoor: "D1",
     data: [
       {
         startAt: "A1",
@@ -554,7 +558,6 @@ export const boardList = [
   {
     id: 13,
     gridSize: 6,
-    exitDoor: "F1",
     data: [
       {
         startAt: "A1",
@@ -609,7 +612,6 @@ export const boardList = [
   {
     id: 14,
     gridSize: 6,
-    exitDoor: "A5",
     data: [
       {
         startAt: "A1",
@@ -664,7 +666,6 @@ export const boardList = [
   {
     id: 15,
     gridSize: 6,
-    exitDoor: "F4",
     data: [
       {
         startAt: "B1",
@@ -725,7 +726,6 @@ export const boardList = [
   {
     id: 16,
     gridSize: 6,
-    exitDoor: "C6",
     data: [
       {
         startAt: "A1",
@@ -792,7 +792,6 @@ export const boardList = [
   {
     id: 17,
     gridSize: 6,
-    exitDoor: "B4",
     data: [
       {
         startAt: "A1",
@@ -865,7 +864,6 @@ export const boardList = [
   {
     id: 18,
     gridSize: 6,
-    exitDoor: "E6",
     data: [
       {
         startAt: "A1",
@@ -944,7 +942,6 @@ export const boardList = [
   {
     id: 19,
     gridSize: 6,
-    exitDoor: "E1",
     data: [
       {
         startAt: "A1",
@@ -1023,7 +1020,6 @@ export const boardList = [
   {
     id: 20,
     gridSize: 6,
-    exitDoor: "C1",
     data: [
       {
         startAt: "A1",
