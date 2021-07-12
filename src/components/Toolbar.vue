@@ -38,7 +38,7 @@
           :clickable="false"
           :dragOnClick="false"
           :disabled="!gameScore.success && !gameScore.replaying"
-          v-if="replayData.length"
+          v-if="replayData.length && boardHistory.length"
         />
       </div>
     </div>
