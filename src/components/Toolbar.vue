@@ -4,17 +4,43 @@
       <button
         class="btn btn-reset"
         @click="handleResetBoard"
-        :disabled="!boardData.length"
+        :disabled="
+          !boardData.length ||
+          !gameScore.moving ||
+          !boardHistory.length ||
+          gameScore.replaying
+        "
       >
         Reset
       </button>
       <button
         class="btn btn-back"
         @click="handleBackBoard"
-        :disabled="!boardHistory.length"
+        :disabled="
+          !gameScore.moving || gameScore.success || gameScore.replaying
+        "
       >
         Back
       </button>
+      <button
+        class="btn btn-replay"
+        @click="handleReplay"
+        :disabled="!gameScore.success || gameScore.replaying"
+      >
+        Replay
+      </button>
+      <div class="replay-silder">
+        <vue-slider
+          v-model="value"
+          :data="replayData"
+          :data-value="'time'"
+          :tooltip="'none'"
+          :clickable="false"
+          :dragOnClick="false"
+          :disabled="!gameScore.success && !gameScore.replaying"
+          v-if="replayData.length"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -22,9 +48,14 @@
 <script lang="ts">
 import Vue from "vue";
 import { boardList } from "@/constant";
+import VueSlider from "vue-slider-component";
+import "vue-slider-component/theme/default.css";
 
 export default Vue.extend({
   name: "Toolbar",
+  components: {
+    VueSlider,
+  },
   computed: {
     boardData() {
       return this.$store.getters.boardData;
@@ -35,30 +66,113 @@ export default Vue.extend({
     boardConfig() {
       return this.$store.getters.boardConfig;
     },
-  },
-  created() {
-    this.boards = boardList;
-    console.log(this.boards[1].data[0].startAt);
+    gameScore() {
+      return this.$store.getters.gameScore;
+    },
   },
   data() {
     return {
-      /* eslint-disable  @typescript-eslint/no-explicit-any */
-      boards: [] as any[],
+      value: 0,
+      backAction: false,
+      replayData: [],
     };
   },
   methods: {
     handleResetBoard() {
-      const activeBoard = this.boards.find(
-        (board) => board.id === this.boardConfig.id
+      const activeBoard = boardList.find(
+        (board) => board.id === (this as any).boardConfig.id
       );
-      this.$store.commit("updateBoardData", activeBoard.data);
-      this.$store.commit("clearHistory");
+      if (activeBoard) {
+        this.$store.commit("updateBoardData", activeBoard.data);
+        if ((this as any).gameScore.success) {
+          this.$store.commit("clearHistory");
+        } else {
+          this.$store.commit("pushHistory", {
+            type: "reset",
+            boardData: activeBoard.data,
+            timestamp: new Date().getTime(),
+          });
+        }
+      }
     },
     handleBackBoard() {
-      const lastData = this.boardHistory[this.boardHistory.length - 2];
-      if (lastData) this.$store.commit("updateBoardData", lastData);
-      else this.handleResetBoard();
-      this.$store.commit("popHistory");
+      const moveHistory = (this as any).boardHistory.filter((e: any) =>
+        ["piecemove", "reset", "back"].includes(e.type)
+      );
+      if (moveHistory.length < 2 + (this as any).gameScore.backLength * 2) {
+        const activeBoard = boardList.find(
+          (board) => board.id === (this as any).boardConfig.id
+        );
+        if (activeBoard) {
+          this.$store.commit("updateBoardData", activeBoard.data);
+          this.$store.commit("pushHistory", {
+            type: "back",
+            boardData: activeBoard.data,
+            timestamp: new Date().getTime(),
+          });
+        }
+      } else {
+        const boardData =
+          moveHistory[
+            moveHistory.length - 2 - (this as any).gameScore.backLength * 2
+          ].boardData;
+        this.$store.commit("updateBoardData", boardData);
+        this.$store.commit("pushHistory", {
+          type: "back",
+          boardData,
+          timestamp: new Date().getTime(),
+        });
+      }
+    },
+    handleReplay() {
+      const startTime = (this as any).boardHistory[0].timestamp;
+      const endTime = (this as any).boardHistory[
+        (this as any).boardHistory.length - 1
+      ].timestamp;
+      const timeHistory = (this as any).boardHistory.map((a: any) => ({
+        ...a,
+        time: Math.floor((a.timestamp - startTime) / 100) * 100,
+      }));
+      (this as any).replayData = [];
+      this.$nextTick();
+      (this as any).replayData = [
+        ...new Array(Math.ceil((endTime - startTime) / 100) + 1),
+      ]
+        .map((_, index) => index * 100)
+        .map((time) => {
+          return timeHistory.find((e: any) => e.time === time) || { time };
+        });
+      (this as any).gameScore.success = false;
+      (this as any).gameScore.replaying = true;
+      const activeBoard = boardList.find(
+        (board) => board.id === (this as any).boardConfig.id
+      );
+      if (activeBoard) {
+        this.$store.commit("updateBoardData", activeBoard.data);
+      }
+      let t = 0;
+      (this as any).reply = setInterval(() => {
+        t += 100;
+        const currentItem = (this as any).replayData.find(
+          (e: any) => e.time === t
+        );
+        if (currentItem) {
+          (this as any).value = currentItem.time;
+          if (currentItem.boardData) {
+            this.$store.commit("updateBoardData", currentItem.boardData);
+          } else {
+            this.$store.commit("updateMousePosition", {
+              x: currentItem.x,
+              y: currentItem.y,
+            });
+          }
+        }
+        if (t > endTime - startTime) {
+          clearInterval((this as any).reply);
+          (this as any).gameScore.success = true;
+          (this as any).gameScore.replaying = false;
+        }
+      }, 100);
     },
   },
 });
@@ -76,9 +190,12 @@ export default Vue.extend({
 .content {
   padding: 10px;
 }
+.replay-silder {
+  margin-bottom: 5px;
+}
 .btn {
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   border: none;
   outline: none;

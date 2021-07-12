@@ -26,7 +26,12 @@ export default new Vuex.Store({
     boardHistory: [] as any[],
     score: {
       success: false,
+      time: 0,
+      moving: 0,
+      backLength: 0,
+      replaying: false,
     },
+    mousePosition: null,
   },
   getters: {
     userInfo: (state) => {
@@ -48,12 +53,13 @@ export default new Vuex.Store({
     gameScore: (state) => {
       return state.score;
     },
+    mousePosition: (state) => {
+      return state.mousePosition;
+    },
   },
   mutations: {
     selectActiveBoard(state, activeBoard) {
       state.activeBoard = { ...activeBoard };
-      state.boardHistory = [];
-      state.score.success = false;
     },
     updateBoardData(state, data) {
       state.activeBoard = {
@@ -61,16 +67,35 @@ export default new Vuex.Store({
         data: [...data],
       };
     },
-    pushHistory(state, data) {
-      state.boardHistory.push(data);
+    updateMousePosition(state, data) {
+      state.mousePosition = data;
     },
-    popHistory(state) {
-      state.boardHistory.pop();
-      state.score.success = false;
+    pushHistory(state, data) {
+      switch (data.type) {
+        case "piecemove":
+          state.score.moving += 1;
+          state.score.backLength = 0;
+          break;
+        case "reset":
+          state.score.backLength = 0;
+          break;
+        case "back":
+          state.score.backLength += 1;
+          break;
+        default:
+          break;
+      }
+      state.boardHistory.push(data);
     },
     clearHistory(state) {
       state.boardHistory = [];
       state.score.success = false;
+      state.score.time = 0;
+      state.score.moving = 0;
+      state.score.backLength = 0;
+    },
+    endGame(state) {
+      state.score.success = true;
     },
   },
   actions: {},

@@ -45,6 +45,12 @@ export default Vue.extend({
         (el: any) => el.id.toString() === e.target.value
       );
       this.$store.commit("selectActiveBoard", { ...activeBoard });
+      this.$store.commit("clearHistory");
+      this.$store.commit("pushHistory", {
+        type: "start",
+        id: e.target.value,
+        timestamp: new Date().getTime(),
+      });
     },
   },
 });

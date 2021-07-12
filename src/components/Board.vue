@@ -5,6 +5,7 @@
         width: boardConfig.width,
         height: boardConfig.height,
       }"
+      @mousemove="handelMousemove"
     >
       <!-- Grid Layer -->
       <v-layer>
@@ -89,7 +90,7 @@
             x: getPositionOfCar(car).x,
             y: getPositionOfCar(car).y,
             id: `car-${index}`,
-            draggable: gameScore.success ? false : true,
+            draggable: gameScore.success || gameScore.replaying ? false : true,
             dragBoundFunc: function (pos) {
               return car.isVertical
                 ? {
@@ -140,6 +141,22 @@
           }"
           v-if="!!gameScore.success"
         />
+        <!-- Mouse Pointer -->
+        <v-image
+          :config="{
+            x: mousePosition.x,
+            y: mousePosition.y,
+            image: pointerImg,
+            width: 24,
+            height: 28,
+          }"
+          v-if="
+            !!mousePosition &&
+            mousePosition.x &&
+            mousePosition.y &&
+            gameScore.replaying
+          "
+        />
       </v-layer>
     </v-stage>
   </div>
@@ -183,6 +200,9 @@ export default Vue.extend({
     gameScore() {
       return this.$store.getters.gameScore;
     },
+    mousePosition() {
+      return this.$store.getters.mousePosition;
+    },
   },
   data() {
     return {
@@ -217,6 +237,7 @@ export default Vue.extend({
         redcarEW: null,
       },
       backImg: null as any,
+      pointerImg: null as any,
       dragging: false,
     };
   },
@@ -235,6 +256,11 @@ export default Vue.extend({
     image.src = `./TrafficJam.png`;
     image.onload = () => {
       this.backImg = image;
+    };
+    const pointer = new window.Image();
+    pointer.src = `./pointer.png`;
+    pointer.onload = () => {
+      this.pointerImg = pointer;
     };
   },
   methods: {
@@ -388,21 +414,32 @@ export default Vue.extend({
         x: e.target.x(),
         y: e.target.y(),
       });
+      // Todo: change const store value?
       localStorage.setItem("activeBoard", JSON.stringify(this.boardData));
       const boardData = JSON.parse(localStorage.getItem("activeBoard") || "[]");
-      boardData[index].startAt = newPos.startAt;
-      e.target.x(newPos.x);
-      e.target.y(newPos.y);
-      this.$store.commit("updateBoardData", boardData);
-      this.$store.commit("pushHistory", boardData);
       localStorage.removeItem("activeBoard");
+
+      if (boardData[index].startAt === newPos.startAt) {
+        e.target.x(newPos.x);
+        e.target.y(newPos.y);
+      } else {
+        boardData[index].startAt = newPos.startAt;
+        this.$store.commit("updateBoardData", boardData);
+        this.$store.commit("pushHistory", {
+          type: "piecemove",
+          index,
+          startAt: newPos.startAt,
+          boardData,
+          timestamp: new Date().getTime(),
+        });
+      }
       // Success Game
       if (
         !!this.getPositionOfDoor().isVertical ===
           !!boardData[index].isVertical &&
         newPos.startAt === this.boardConfig.exitDoor
       ) {
-        this.gameScore.success = true;
+        this.$store.commit("endGame");
       }
     },
     // Get Car Image
@@ -418,6 +455,15 @@ export default Vue.extend({
         : car.cellCount === 2
         ? images[index % 7]
         : images[(index % 4) + 14];
+    },
+    handelMousemove(e: any) {
+      if (this.gameScore.success || this.gameScore.replaying) return;
+      this.$store.commit("pushHistory", {
+        type: "mousemove",
+        x: e.evt.layerX,
+        y: e.evt.layerY,
+        timestamp: new Date().getTime(),
+      });
     },
   },
 });
