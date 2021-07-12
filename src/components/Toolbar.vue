@@ -176,6 +176,7 @@ export default Vue.extend({
           clearInterval((this as any).reply);
           (this as any).gameScore.success = true;
           (this as any).gameScore.replaying = false;
+          (this as any).replayData = [];
         }
       }, 100);
     },
