@@ -46,6 +46,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 import Vue from "vue";
 import { boardList } from "@/constant";
 import VueSlider from "vue-slider-component";
