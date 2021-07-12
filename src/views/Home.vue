@@ -10,6 +10,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 import Vue from "vue";
 import Board from "@/components/Board.vue"; // @ is an alias to /src
 import Score from "@/components/Score.vue";
