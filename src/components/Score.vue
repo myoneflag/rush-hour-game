@@ -2,11 +2,11 @@
   <div class="score">
     <div class="content">
       <div class="user-email">
-        <h3>{{ user.email }}</h3>
+        <input class="input-email" type="email" :value="user.email" />
       </div>
       <div class="select">
         <label for="standard-select">Stage</label>
-        <select id="standard-select" @change="handleChangeBoard">
+        <select class="standard-select" @change="handleChangeBoard">
           <option disabled selected>Select Board</option>
           <option :value="board.id" v-for="board in boards" :key="board.id">
             {{ `Level ${board.id} (${board.gridSize} x ${board.gridSize})` }}
@@ -68,7 +68,12 @@ export default Vue.extend({
 .content {
   padding: 10px;
 }
-#standard-select {
+.input-email {
+  padding: 10px;
+  margin: 5px;
+  outline: none;
+}
+.standard-select {
   outline: none;
   padding: 10px;
   margin-left: 10px;

@@ -156,7 +156,7 @@ export default Vue.extend({
         this.$store.commit("updateBoardData", activeBoard.data);
       }
       let t = 0;
-      (this as any).reply = setInterval(() => {
+      let reply = setInterval(() => {
         t += 100;
         const currentItem = (this as any).replayData.find(
           (e: any) => e.time === t
@@ -173,7 +173,7 @@ export default Vue.extend({
           }
         }
         if (t > endTime - startTime) {
-          clearInterval((this as any).reply);
+          clearInterval(reply);
           (this as any).gameScore.success = true;
           (this as any).gameScore.replaying = false;
           (this as any).replayData = [];
