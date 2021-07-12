@@ -86,6 +86,11 @@ export default Vue.extend({
         this.$store.commit("updateBoardData", activeBoard.data);
         if ((this as any).gameScore.success) {
           this.$store.commit("clearHistory");
+          this.$store.commit("pushHistory", {
+            type: "start",
+            id: activeBoard.id,
+            timestamp: new Date().getTime(),
+          });
         } else {
           this.$store.commit("pushHistory", {
             type: "reset",
