@@ -2,10 +2,9 @@
   <div class="home">
     <div class="container">
       <Score />
-      <Board msg="Welcome to Your Vue.js + TypeScript App" />
+      <Board />
       <Toolbar />
     </div>
-    <!-- <img alt="Vue logo" src="../assets/logo.png" /> -->
   </div>
 </template>
 
@@ -30,7 +29,6 @@ export default Vue.extend({
 <style scoped>
 .home {
   width: 100%;
-  /* min-height: 100vh; */
   display: flex;
   height: 100%;
   align-items: center;
