@@ -5,7 +5,7 @@
         width: boardConfig.width,
         height: boardConfig.height,
       }"
-      @mousemove="handelMousemove"
+      @mousemove="handleMousemove"
     >
       <!-- Grid Layer -->
       <v-layer>
@@ -209,13 +209,13 @@ export default Vue.extend({
     return {
       letters: genCharArray("a", "f"),
       assets: {
-        AcarEW: null,
-        BcarEW: null,
-        CcarEW: null,
-        DcarEW: null,
-        EcarEW: null,
-        FcarEW: null,
-        GcarEW: null,
+        AcarEW: null, // green
+        BcarEW: null, // orange
+        CcarEW: null, // light blue
+        DcarEW: null, // pink
+        EcarEW: null, // purple
+        FcarEW: null, // light green
+        GcarEW: null, // black
 
         AcarNS: null,
         BcarNS: null,
@@ -225,10 +225,10 @@ export default Vue.extend({
         FcarNS: null,
         GcarNS: null,
 
-        OlorryEW: null,
-        PlorryEW: null,
-        QlorryEW: null,
-        RlorryEW: null,
+        OlorryEW: null, // yellow
+        PlorryEW: null, // purple
+        QlorryEW: null, // blue
+        RlorryEW: null, // green
 
         OlorryNS: null,
         PlorryNS: null,
@@ -297,10 +297,11 @@ export default Vue.extend({
       };
     },
     getPositionOfDoor() {
-      const rowIndex = this.letters.indexOf(
-        this.boardConfig.exitDoor.charAt(0)
-      );
-      const colIndex = parseInt(this.boardConfig.exitDoor.substring(1)) - 1;
+      var exitPosIndices = this.getRowColIndices(this.boardConfig.exitDoor);
+
+      const rowIndex = exitPosIndices.row;
+      const colIndex = exitPosIndices.col;
+
       if (colIndex === 0) {
         return {
           x: 0,
@@ -403,6 +404,14 @@ export default Vue.extend({
         return pos.x > max ? max : pos.x < min ? min : pos.x;
       }
     },
+    getRowColIndices(positionString: string): any {
+      const rowIndex = this.letters.indexOf(positionString.charAt(0));
+      const colIndex = parseInt(positionString.substring(1)) - 1;
+      return {
+        row: rowIndex,
+        col: colIndex,
+      };
+    },
     // Drag event
     handleDragEndCar(e: any, index: number) {
       this.dragging = false;
@@ -430,28 +439,38 @@ export default Vue.extend({
         });
       }
       // Success Game
+      var exitPosIndices = this.getRowColIndices(this.boardConfig.exitDoor);
+      var newPosIndices = this.getRowColIndices(newPos.startAt);
+
+      // display bug on exit door... so red car width=1
+      const redCarWidth = 1;
+
       if (
         !!this.getPositionOfDoor().isVertical ===
           !!boardData[index].isVertical &&
-        newPos.startAt === this.boardConfig.exitDoor
+        exitPosIndices.row === newPosIndices.row &&
+        exitPosIndices.col - redCarWidth === newPosIndices.col
       ) {
         this.$store.commit("endGame");
       }
     },
+
     // Get Car Image
     getCarImage(car: any, index: number): any {
       const images = Object.values(this.assets);
       return car.color === "red"
         ? this.assets[`redcarEW`]
         : car.isVertical
-        ? car.cellCount === 2
+        ? // vertical
+          car.cellCount === 2
           ? images[(index % 7) + 7]
           : images[(index % 4) + 18]
-        : car.cellCount === 2
+        : // horizontal
+        car.cellCount === 2
         ? images[index % 7]
         : images[(index % 4) + 14];
     },
-    handelMousemove(e: any) {
+    handleMousemove(e: any) {
       if (this.gameScore.success || this.gameScore.replaying) return;
       this.$store.commit("pushHistory", {
         type: "mousemove",

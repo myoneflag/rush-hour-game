@@ -6,14 +6,14 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     user: {
-      email: "grisha97924@gmail.com",
-      name: "Artem",
+      email: "user@domain.com",
+      name: "Enter Name Here",
     },
     boardConfig: {
       width: 540,
       height: 540,
       gridSize: 6,
-      exitDoor: "C1",
+      exitDoor: "C6",
       gridLineColor: "#ddd",
     },
     activeBoard: {
