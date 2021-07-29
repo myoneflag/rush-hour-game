@@ -22,7 +22,7 @@ export const boardList = [
       {
         startAt: "A1",
         cellCount: 2,
-        color: "green",
+        color: "lgreen",
         isVertical: false,
       },
       {
@@ -76,7 +76,7 @@ export const boardList = [
       {
         startAt: "A1",
         cellCount: 2,
-        color: "green",
+        color: "lgreen",
         isVertical: true,
       },
       {
@@ -238,7 +238,7 @@ export const boardList = [
       {
         startAt: "A2",
         cellCount: 2,
-        color: "green",
+        color: "lgreen",
         isVertical: true,
       },
       {
@@ -376,7 +376,7 @@ export const boardList = [
       {
         startAt: "A1",
         cellCount: 2,
-        color: "green",
+        color: "lgreen",
         isVertical: false,
       },
       {
@@ -454,7 +454,7 @@ export const boardList = [
       {
         startAt: "A2",
         cellCount: 2,
-        color: "green",
+        color: "lgreen",
         isVertical: false,
       },
       {
@@ -532,7 +532,7 @@ export const boardList = [
       {
         startAt: "F4",
         cellCount: 2,
-        color: "green",
+        color: "yellow",
         isVertical: false,
       },
     ],
@@ -544,13 +544,13 @@ export const boardList = [
       {
         startAt: "A1",
         cellCount: 3,
-        color: "orange",
+        color: "yellow",
         isVertical: true,
       },
       {
         startAt: "A2",
         cellCount: 2,
-        color: "green",
+        color: "lgreen",
         isVertical: false,
       },
       {

@@ -112,7 +112,7 @@
             :config="{
               x: 0,
               y: 0,
-              image: getCarImage(car, index),
+              image: getCarImage(car),
               width: car.isVertical
                 ? boardConfig.cellWidth
                 : car.cellCount * boardConfig.cellWidth,
@@ -120,7 +120,7 @@
                 ? car.cellCount * boardConfig.cellHeight
                 : boardConfig.cellHeight,
             }"
-            v-if="!!getCarImage(car, index)"
+            v-if="!!getCarImage(car)"
           />
         </v-group>
       </v-layer>
@@ -209,33 +209,37 @@ export default Vue.extend({
     return {
       letters: genCharArray("a", "f"),
       assets: {
-        AcarEW: null, // green
-        BcarEW: null, // orange
-        CcarEW: null, // light blue
-        DcarEW: null, // pink
-        EcarEW: null, // purple
-        FcarEW: null, // light green
-        GcarEW: null, // black
+        greencarEW: null, // green
+        orangecarEW: null, // orange
+        bluecarEW: null, // light blue
+        pinkcarEW: null, // pink
+        purplecarEW: null, // purple
+        lgreencarEW: null, // light green
+        blackcarEW: null, // black
+        yellowcarEW: null, // yellow
+        graycarEW: null, // gray
 
-        AcarNS: null,
-        BcarNS: null,
-        CcarNS: null,
-        DcarNS: null,
-        EcarNS: null,
-        FcarNS: null,
-        GcarNS: null,
+        greencarNS: null,
+        orangecarNS: null,
+        bluecarNS: null,
+        pinkcarNS: null,
+        purplecarNS: null,
+        lgreencarNS: null,
+        blackcarNS: null,
+        yellowcarNS: null, // yellow
+        graycarNS: null, // gray
 
-        OlorryEW: null, // yellow
-        PlorryEW: null, // purple
-        QlorryEW: null, // blue
-        RlorryEW: null, // green
+        yellowlorryEW: null, // yellow
+        purplelorryEW: null, // purple
+        bluelorryEW: null, // blue
+        greenlorryEW: null, // green
 
-        OlorryNS: null,
-        PlorryNS: null,
-        QlorryNS: null,
-        RlorryNS: null,
+        yellowlorryNS: null,
+        purplelorryNS: null,
+        bluelorryNS: null,
+        greenlorryNS: null,
 
-        redcarEW: null,
+        redcarEW: null, // red
       },
       backImg: null as any,
       pointerImg: null as any,
@@ -456,19 +460,15 @@ export default Vue.extend({
     },
 
     // Get Car Image
-    getCarImage(car: any, index: number): any {
+    getCarImage(car: any): any {
+      const keys = Object.keys(this.assets);
       const images = Object.values(this.assets);
-      return car.color === "red"
-        ? this.assets[`redcarEW`]
-        : car.isVertical
-        ? // vertical
-          car.cellCount === 2
-          ? images[(index % 7) + 7]
-          : images[(index % 4) + 18]
-        : // horizontal
-        car.cellCount === 2
-        ? images[index % 7]
-        : images[(index % 4) + 14];
+
+      var orientation = car.isVertical ? "NS" : "EW";
+      var vehicleType = car.cellCount == 2 ? "car" : "lorry";
+      var assetName = car.color + vehicleType + orientation;
+      var index = keys.indexOf(assetName);
+      return images[index];
     },
     handleMousemove(e: any) {
       if (this.gameScore.success || this.gameScore.replaying) return;

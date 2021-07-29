@@ -2,6 +2,7 @@
   <div class="score">
     <div class="content">
       <div class="user-email">
+        <label for="input-email">Email</label>
         <input class="input-email" type="email" :value="user.email" />
       </div>
       <div class="select">
