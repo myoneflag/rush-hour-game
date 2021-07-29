@@ -298,7 +298,7 @@ export const boardList = [
       {
         startAt: "A2",
         cellCount: 2,
-        color: "green",
+        color: "lgreen",
         isVertical: true,
       },
       {
