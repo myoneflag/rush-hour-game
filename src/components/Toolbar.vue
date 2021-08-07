@@ -29,15 +29,17 @@
       >
         Replay
       </button>
-      <div class="replay-silder">
+      <div class="replay-slider">
         <vue-slider
           v-model="value"
           :data="replayData"
           :data-value="'time'"
           :tooltip="'none'"
-          :clickable="false"
-          :dragOnClick="false"
+          :clickable="true"
+          :draggable="true"
+          :dragOnClick="true"
           :disabled="!gameScore.success && !gameScore.replaying"
+          @change="(e) => handleSliderEvents(e, value)"
           v-if="replayData.length && boardHistory.length > 1"
         />
       </div>
@@ -130,6 +132,9 @@ export default Vue.extend({
         });
       }
     },
+    handleSliderEvents(e: any, value: number) {
+      (this as any).t = value;
+    },
     handleReplay() {
       const startTime = (this as any).boardHistory[0].timestamp;
       const endTime = (this as any).boardHistory[
@@ -148,6 +153,7 @@ export default Vue.extend({
         .map((time) => {
           return timeHistory.find((e: any) => e.time === time) || { time };
         });
+
       (this as any).gameScore.success = false;
       (this as any).gameScore.replaying = true;
       const activeBoard = boardList.find(
@@ -156,11 +162,13 @@ export default Vue.extend({
       if (activeBoard) {
         this.$store.commit("updateBoardData", activeBoard.data);
       }
-      let t = 0;
+
+      (this as any).t = 0;
+
       let replay = setInterval(() => {
-        t += 100;
+        (this as any).t += 100;
         const currentItem = (this as any).replayData.find(
-          (e: any) => e.time === t
+          (e: any) => e.time === (this as any).t
         );
         if (currentItem) {
           (this as any).value = currentItem.time;
@@ -173,8 +181,9 @@ export default Vue.extend({
             });
           }
         }
-        if (t > endTime - startTime) {
+        if ((this as any).t > endTime - startTime) {
           clearInterval(replay);
+          (this as any).t = 0;
           (this as any).gameScore.success = true;
           (this as any).gameScore.replaying = false;
           (this as any).replayData = [];
@@ -197,7 +206,7 @@ export default Vue.extend({
 .content {
   padding: 10px;
 }
-.replay-silder {
+.replay-slider {
   margin-bottom: 5px;
 }
 .btn {
