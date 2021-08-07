@@ -232,7 +232,7 @@ export const boardList = [
     ],
   },
   {
-    id: 5,
+    id: 7,
     gridSize: 6,
     data: [
       {
